@@ -1,0 +1,123 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* SOAR Security Platform Design System */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
+@layer base {
+  :root {
+    /* Cybersecurity Dark Theme */
+    --background: 220 27% 8%;
+    --foreground: 213 31% 91%;
+
+    --card: 220 27% 10%;
+    --card-foreground: 213 31% 91%;
+
+    --popover: 220 27% 10%;
+    --popover-foreground: 213 31% 91%;
+
+    /* Security Blue Primary */
+    --primary: 200 98% 39%;
+    --primary-foreground: 220 27% 8%;
+    
+    /* Cyber Accent */
+    --secondary: 220 27% 12%;
+    --secondary-foreground: 213 31% 91%;
+
+    --muted: 220 27% 14%;
+    --muted-foreground: 213 19% 65%;
+
+    --accent: 193 100% 50%;
+    --accent-foreground: 220 27% 8%;
+
+    /* Threat Colors */
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 213 31% 91%;
+    
+    --success: 142 76% 36%;
+    --success-foreground: 213 31% 91%;
+    
+    --warning: 38 92% 50%;
+    --warning-foreground: 220 27% 8%;
+
+    --border: 220 27% 16%;
+    --input: 220 27% 16%;
+    --ring: 200 98% 39%;
+
+    --radius: 0.75rem;
+    
+    /* Security Gradients */
+    --gradient-primary: linear-gradient(135deg, hsl(200 98% 39%), hsl(193 100% 50%));
+    --gradient-cyber: linear-gradient(135deg, hsl(220 27% 8%), hsl(220 27% 12%));
+    --gradient-threat: linear-gradient(135deg, hsl(0 84% 60%), hsl(15 90% 55%));
+    --gradient-success: linear-gradient(135deg, hsl(142 76% 36%), hsl(155 90% 40%));
+    
+    /* Security Shadows */
+    --shadow-cyber: 0 4px 20px -2px hsl(200 98% 39% / 0.15);
+    --shadow-threat: 0 4px 20px -2px hsl(0 84% 60% / 0.2);
+    --shadow-glow: 0 0 30px hsl(193 100% 50% / 0.3);
+    
+    /* Animations */
+    --transition-cyber: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    
+    /* Sidebar colors remain for consistency */
+    --sidebar-background: 220 27% 8%;
+    --sidebar-foreground: 213 31% 91%;
+    --sidebar-primary: 200 98% 39%;
+    --sidebar-primary-foreground: 220 27% 8%;
+    --sidebar-accent: 220 27% 12%;
+    --sidebar-accent-foreground: 213 31% 91%;
+    --sidebar-border: 220 27% 16%;
+    --sidebar-ring: 200 98% 39%;
+
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground font-inter;
+  }
+}
+
+@layer utilities {
+  .font-inter {
+    font-family: 'Inter', system-ui, sans-serif;
+  }
+  
+  .gradient-primary {
+    background: var(--gradient-primary);
+  }
+  
+  .gradient-cyber {
+    background: var(--gradient-cyber);
+  }
+  
+  .gradient-threat {
+    background: var(--gradient-threat);
+  }
+  
+  .gradient-success {
+    background: var(--gradient-success);
+  }
+  
+  .shadow-cyber {
+    box-shadow: var(--shadow-cyber);
+  }
+  
+  .shadow-threat {
+    box-shadow: var(--shadow-threat);
+  }
+  
+  .shadow-glow {
+    box-shadow: var(--shadow-glow);
+  }
+  
+  .transition-cyber {
+    transition: var(--transition-cyber);
+  }
+}
