@@ -13,6 +13,10 @@ export default {
       },
     },
     extend: {
+      fontFamily: {
+        'inter': ['Inter', 'sans-serif'],
+        'grotesk': ['Space Grotesk', 'sans-serif'],
+      },
       colors: {
         border: "hsl(var(--border))",
         input: "hsl(var(--input))",
@@ -30,14 +34,6 @@ export default {
         destructive: {
           DEFAULT: "hsl(var(--destructive))",
           foreground: "hsl(var(--destructive-foreground))",
-        },
-        success: {
-          DEFAULT: "hsl(var(--success))",
-          foreground: "hsl(var(--success-foreground))",
-        },
-        warning: {
-          DEFAULT: "hsl(var(--warning))",
-          foreground: "hsl(var(--warning-foreground))",
         },
         muted: {
           DEFAULT: "hsl(var(--muted))",
@@ -65,6 +61,13 @@ export default {
           border: "hsl(var(--sidebar-border))",
           ring: "hsl(var(--sidebar-ring))",
         },
+        // Cyber security specific colors
+        'threat-high': "hsl(var(--threat-high))",
+        'threat-medium': "hsl(var(--threat-medium))",
+        'threat-low': "hsl(var(--threat-low))",
+        'safe': "hsl(var(--safe))",
+        'cyber-blue': "hsl(var(--cyber-blue))",
+        'cyber-green': "hsl(var(--cyber-green))",
       },
       borderRadius: {
         lg: "var(--radius)",

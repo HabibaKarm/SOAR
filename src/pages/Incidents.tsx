@@ -1,299 +1,448 @@
 import { useState } from "react";
-import { FileText, Search, Plus, User, Calendar, AlertCircle, CheckCircle, Clock } from "lucide-react";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Textarea } from "@/components/ui/textarea";
+import { AlertTriangle, User, Clock, CheckCircle, XCircle, Download, FileText, MessageSquare } from "lucide-react";
 
-const incidentData = [
+interface SecurityIncident {
+  id: string;
+  ticketId: string;
+  threatType: "Phishing" | "DDoS" | "Brute Force" | "Malware" | "Data Breach" | "Insider Threat";
+  title: string;
+  description: string;
+  severity: "Critical" | "High" | "Medium" | "Low";
+  status: "Open" | "In Progress" | "Resolved" | "Closed";
+  analystAssigned: string;
+  reportedBy: string;
+  createdAt: string;
+  updatedAt: string;
+  comments: Comment[];
+  affectedSystems: string[];
+  estimatedImpact: string;
+}
+
+interface Comment {
+  id: string;
+  author: string;
+  content: string;
+  timestamp: string;
+}
+
+const securityIncidents: SecurityIncident[] = [
   {
-    id: "INC-2024-001",
-    title: "Suspected Phishing Campaign Targeting Finance Team",
-    type: "Phishing",
-    priority: "High",
-    status: "Open",
-    assignee: "Sarah Chen",
-    created: "2024-01-15 09:30",
-    lastUpdated: "2024-01-15 14:22",
-    description: "Multiple phishing emails detected targeting finance department with fake invoice attachments"
-  },
-  {
-    id: "INC-2024-002", 
-    title: "Malware C&C Communication Detected",
-    type: "Malware",
-    priority: "Critical",
+    id: "1",
+    ticketId: "INC-2024-001",
+    threatType: "Phishing",
+    title: "Large-scale Phishing Campaign Targeting Finance Team",
+    description: "Multiple suspicious emails detected targeting finance department with fake invoice attachments containing malware.",
+    severity: "Critical",
     status: "In Progress",
-    assignee: "Mike Rodriguez",
-    created: "2024-01-15 08:15",
-    lastUpdated: "2024-01-15 13:45",
-    description: "Endpoint detected communicating with known malware command & control server"
+    analystAssigned: "Sarah Chen",
+    reportedBy: "Auto-Detection System",
+    createdAt: "2024-01-15 09:15:33",
+    updatedAt: "2024-01-15 14:23:45",
+    comments: [
+      {
+        id: "c1",
+        author: "Sarah Chen",
+        content: "Initial analysis shows 23 emails quarantined. Investigating email headers and attachment hashes.",
+        timestamp: "2024-01-15 09:30:15"
+      },
+      {
+        id: "c2",
+        author: "Mike Rodriguez",
+        content: "Finance team has been notified. No successful infections reported so far.",
+        timestamp: "2024-01-15 11:45:22"
+      }
+    ],
+    affectedSystems: ["Email Gateway", "Finance Workstations"],
+    estimatedImpact: "High - Potential financial fraud"
   },
   {
-    id: "INC-2024-003",
-    title: "Brute Force Attack on SSH Services",
-    type: "Network Attack",
-    priority: "Medium",
+    id: "2",
+    ticketId: "INC-2024-002",
+    threatType: "DDoS",
+    title: "Distributed Denial of Service Attack on Web Servers",
+    description: "Coordinated DDoS attack targeting main web application servers causing intermittent service disruptions.",
+    severity: "High",
     status: "Resolved",
-    assignee: "Alex Thompson",
-    created: "2024-01-14 22:30",
-    lastUpdated: "2024-01-15 10:15",
-    description: "Multiple failed SSH login attempts detected from suspicious IP addresses"
+    analystAssigned: "Alex Thompson",
+    reportedBy: "Network Monitoring",
+    createdAt: "2024-01-15 08:30:12",
+    updatedAt: "2024-01-15 12:15:08",
+    comments: [
+      {
+        id: "c3",
+        author: "Alex Thompson",
+        content: "Attack mitigated using CDN protection. Attack peaked at 50Gbps.",
+        timestamp: "2024-01-15 10:15:33"
+      }
+    ],
+    affectedSystems: ["Web Servers", "CDN", "Load Balancers"],
+    estimatedImpact: "Medium - Temporary service degradation"
   },
   {
-    id: "INC-2024-004",
-    title: "Suspicious File Upload Activity",
-    type: "Data Exfiltration",
-    priority: "High", 
+    id: "3",
+    ticketId: "INC-2024-003",
+    threatType: "Malware",
+    title: "Ransomware Detection on Development Server",
+    description: "Ransomware activity detected on development server attempting to encrypt project files.",
+    severity: "Critical",
     status: "Open",
-    assignee: "Lisa Wang",
-    created: "2024-01-15 11:45",
-    lastUpdated: "2024-01-15 12:30",
-    description: "Unusual large file upload patterns detected in cloud storage systems"
+    analystAssigned: "Emily Davis",
+    reportedBy: "Endpoint Detection",
+    createdAt: "2024-01-15 07:45:21",
+    updatedAt: "2024-01-15 07:45:21",
+    comments: [],
+    affectedSystems: ["Dev Server 03", "File Share"],
+    estimatedImpact: "Critical - Potential data loss"
   },
   {
-    id: "INC-2024-005",
-    title: "Unauthorized Access Attempt",
-    type: "Access Control",
-    priority: "Medium",
+    id: "4",
+    ticketId: "INC-2024-004",
+    threatType: "Brute Force",
+    title: "Multiple Failed Login Attempts on Admin Accounts",
+    description: "Sustained brute force attack targeting administrative accounts from multiple IP addresses.",
+    severity: "Medium",
     status: "In Progress",
-    assignee: "David Kumar",
-    created: "2024-01-15 07:20",
-    lastUpdated: "2024-01-15 14:10",
-    description: "Multiple failed login attempts on admin accounts from different geographic locations"
+    analystAssigned: "James Wilson",
+    reportedBy: "Authentication System",
+    createdAt: "2024-01-15 06:20:45",
+    updatedAt: "2024-01-15 13:30:12",
+    comments: [
+      {
+        id: "c4",
+        author: "James Wilson",
+        content: "Account lockout policies activated. Investigating source IPs and attack patterns.",
+        timestamp: "2024-01-15 08:15:33"
+      }
+    ],
+    affectedSystems: ["Active Directory", "VPN Gateway"],
+    estimatedImpact: "Low - No successful breaches detected"
   }
 ];
 
-export default function Incidents() {
-  const [searchTerm, setSearchTerm] = useState("");
-  const [statusFilter, setStatusFilter] = useState("all");
-  const [priorityFilter, setPriorityFilter] = useState("all");
+const Incidents = () => {
+  const [incidents, setIncidents] = useState<SecurityIncident[]>(securityIncidents);
+  const [selectedIncident, setSelectedIncident] = useState<SecurityIncident | null>(null);
+  const [newComment, setNewComment] = useState("");
 
-  const filteredIncidents = incidentData.filter(incident => {
-    const matchesSearch = incident.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         incident.id.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         incident.assignee.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesStatus = statusFilter === "all" || incident.status === statusFilter;
-    const matchesPriority = priorityFilter === "all" || incident.priority === priorityFilter;
-    return matchesSearch && matchesStatus && matchesPriority;
-  });
+  const openIncidents = incidents.filter(i => i.status === "Open").length;
+  const inProgressIncidents = incidents.filter(i => i.status === "In Progress").length;
+  const criticalIncidents = incidents.filter(i => i.severity === "Critical").length;
+  const resolvedToday = incidents.filter(i => i.status === "Resolved" && i.updatedAt.startsWith("2024-01-15")).length;
 
-  const getStatusIcon = (status: string) => {
-    switch (status) {
-      case "Open":
-        return <AlertCircle className="h-4 w-4 text-destructive" />;
-      case "In Progress":
-        return <Clock className="h-4 w-4 text-warning" />;
-      case "Resolved":
-        return <CheckCircle className="h-4 w-4 text-success" />;
+  const getSeverityBadge = (severity: string) => {
+    switch (severity) {
+      case "Critical":
+        return <Badge variant="destructive" className="bg-threat-high/20 text-threat-high border-threat-high/50">Critical</Badge>;
+      case "High":
+        return <Badge className="bg-threat-medium/20 text-threat-medium border-threat-medium/50">High</Badge>;
+      case "Medium":
+        return <Badge className="bg-threat-low/20 text-threat-low border-threat-low/50">Medium</Badge>;
+      case "Low":
+        return <Badge variant="outline" className="border-safe/50 text-safe">Low</Badge>;
       default:
-        return <AlertCircle className="h-4 w-4 text-muted-foreground" />;
+        return <Badge variant="outline">{severity}</Badge>;
     }
   };
 
   const getStatusBadge = (status: string) => {
     switch (status) {
       case "Open":
-        return <Badge variant="destructive">{status}</Badge>;
+        return <Badge variant="destructive">Open</Badge>;
       case "In Progress":
-        return <Badge variant="secondary" className="bg-warning/10 text-warning">{status}</Badge>;
+        return <Badge className="bg-cyber-blue/20 text-cyber-blue border-cyber-blue/50">In Progress</Badge>;
       case "Resolved":
-        return <Badge variant="secondary" className="bg-success/10 text-success">{status}</Badge>;
+        return <Badge className="bg-safe/20 text-safe border-safe/50">Resolved</Badge>;
+      case "Closed":
+        return <Badge variant="outline">Closed</Badge>;
       default:
         return <Badge variant="outline">{status}</Badge>;
     }
   };
 
-  const getPriorityBadge = (priority: string) => {
-    switch (priority) {
-      case "Critical":
-        return <Badge variant="destructive" className="gradient-threat">{priority}</Badge>;
-      case "High":
-        return <Badge variant="destructive">{priority}</Badge>;
-      case "Medium":
-        return <Badge variant="secondary" className="bg-warning/10 text-warning">{priority}</Badge>;
-      case "Low":
-        return <Badge variant="outline">{priority}</Badge>;
-      default:
-        return <Badge variant="outline">{priority}</Badge>;
-    }
+  const getThreatTypeBadge = (type: string) => {
+    const colors = {
+      "Phishing": "bg-threat-high/20 text-threat-high border-threat-high/50",
+      "DDoS": "bg-threat-medium/20 text-threat-medium border-threat-medium/50",
+      "Brute Force": "bg-threat-low/20 text-threat-low border-threat-low/50",
+      "Malware": "bg-threat-high/20 text-threat-high border-threat-high/50",
+      "Data Breach": "bg-threat-high/20 text-threat-high border-threat-high/50",
+      "Insider Threat": "bg-threat-medium/20 text-threat-medium border-threat-medium/50"
+    };
+    
+    return (
+      <Badge className={colors[type as keyof typeof colors] || "bg-muted/20 text-muted-foreground"}>
+        {type}
+      </Badge>
+    );
   };
 
-  const stats = {
-    total: incidentData.length,
-    open: incidentData.filter(i => i.status === "Open").length,
-    inProgress: incidentData.filter(i => i.status === "In Progress").length,
-    resolved: incidentData.filter(i => i.status === "Resolved").length
+  const addComment = () => {
+    if (!selectedIncident || !newComment.trim()) return;
+    
+    const comment: Comment = {
+      id: Date.now().toString(),
+      author: "Current User",
+      content: newComment,
+      timestamp: new Date().toISOString().replace('T', ' ').substring(0, 16)
+    };
+
+    setIncidents(incidents.map(incident => 
+      incident.id === selectedIncident.id 
+        ? { ...incident, comments: [...incident.comments, comment] }
+        : incident
+    ));
+
+    setSelectedIncident({
+      ...selectedIncident,
+      comments: [...selectedIncident.comments, comment]
+    });
+
+    setNewComment("");
+  };
+
+  const exportIncidents = () => {
+    const csvContent = incidents.map(incident => 
+      `${incident.ticketId},${incident.threatType},${incident.severity},${incident.status},${incident.analystAssigned},${incident.createdAt}`
+    ).join('\n');
+    
+    const element = document.createElement('a');
+    element.setAttribute('href', 'data:text/csv;charset=utf-8,' + encodeURIComponent('Ticket ID,Threat Type,Severity,Status,Analyst,Created\n' + csvContent));
+    element.setAttribute('download', 'security-incidents.csv');
+    element.style.display = 'none';
+    document.body.appendChild(element);
+    element.click();
+    document.body.removeChild(element);
   };
 
   return (
     <div className="space-y-6">
-      <div className="space-y-2">
-        <h1 className="text-3xl font-bold  ">
-          Incident Management
-        </h1>
-        <p className="text-muted-foreground">
-          Track, assign, and resolve security incidents efficiently
-        </p>
+      {/* Header */}
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-3xl font-grotesk font-bold text-foreground">Security Incidents</h1>
+          <p className="text-muted-foreground">Incident response and ticket management</p>
+        </div>
+        <Button onClick={exportIncidents} className="bg-gradient-cyber hover:opacity-90 text-white">
+          <Download className="h-4 w-4 mr-2" />
+          Export Incidents
+        </Button>
       </div>
 
-      <div className="grid gap-6 md:grid-cols-4">
-        <Card className="shadow-cyber border-primary/20">
-          <CardContent className="p-6">
-            <div className="flex items-center space-x-2">
-              <FileText className="h-5 w-5 text-primary" />
-              <span className="text-sm font-medium">Total</span>
+      {/* Statistics Cards */}
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+        <Card className="gradient-card border-border/50">
+          <CardContent className="p-4">
+            <div className="flex items-center gap-3">
+              <AlertTriangle className="h-8 w-8 text-threat-high" />
+              <div>
+                <p className="text-2xl font-grotesk font-bold text-foreground">{openIncidents}</p>
+                <p className="text-sm text-muted-foreground">Open Incidents</p>
+              </div>
             </div>
-            <div className="text-2xl font-bold text-primary mt-2">{stats.total}</div>
           </CardContent>
         </Card>
 
-        <Card className="shadow-cyber border-primary/20">
-          <CardContent className="p-6">
-            <div className="flex items-center space-x-2">
-              <AlertCircle className="h-5 w-5 text-destructive" />
-              <span className="text-sm font-medium">Open</span>
+        <Card className="gradient-card border-border/50">
+          <CardContent className="p-4">
+            <div className="flex items-center gap-3">
+              <Clock className="h-8 w-8 text-cyber-blue" />
+              <div>
+                <p className="text-2xl font-grotesk font-bold text-foreground">{inProgressIncidents}</p>
+                <p className="text-sm text-muted-foreground">In Progress</p>
+              </div>
             </div>
-            <div className="text-2xl font-bold text-destructive mt-2">{stats.open}</div>
           </CardContent>
         </Card>
 
-        <Card className="shadow-cyber border-primary/20">
-          <CardContent className="p-6">
-            <div className="flex items-center space-x-2">
-              <Clock className="h-5 w-5 text-warning" />
-              <span className="text-sm font-medium">In Progress</span>
+        <Card className="gradient-card border-border/50">
+          <CardContent className="p-4">
+            <div className="flex items-center gap-3">
+              <XCircle className="h-8 w-8 text-threat-high" />
+              <div>
+                <p className="text-2xl font-grotesk font-bold text-foreground">{criticalIncidents}</p>
+                <p className="text-sm text-muted-foreground">Critical</p>
+              </div>
             </div>
-            <div className="text-2xl font-bold text-warning mt-2">{stats.inProgress}</div>
           </CardContent>
         </Card>
 
-        <Card className="shadow-cyber border-primary/20">
-          <CardContent className="p-6">
-            <div className="flex items-center space-x-2">
-              <CheckCircle className="h-5 w-5 text-success" />
-              <span className="text-sm font-medium">Resolved</span>
+        <Card className="gradient-card border-border/50">
+          <CardContent className="p-4">
+            <div className="flex items-center gap-3">
+              <CheckCircle className="h-8 w-8 text-safe" />
+              <div>
+                <p className="text-2xl font-grotesk font-bold text-foreground">{resolvedToday}</p>
+                <p className="text-sm text-muted-foreground">Resolved Today</p>
+              </div>
             </div>
-            <div className="text-2xl font-bold text-success mt-2">{stats.resolved}</div>
           </CardContent>
         </Card>
       </div>
 
-      <Card className="shadow-cyber border-primary/20">
+      {/* Incidents Table */}
+      <Card className="gradient-card border-border/50">
         <CardHeader>
-          <CardTitle className="flex items-center space-x-2">
-            <FileText className="h-5 w-5 text-primary" />
-            <span>Security Incidents</span>
-          </CardTitle>
+          <CardTitle className="text-foreground font-grotesk">Security Incident Tickets</CardTitle>
+          <CardDescription className="text-muted-foreground">
+            Active security incidents and response tracking
+          </CardDescription>
         </CardHeader>
-        <CardContent className="space-y-4">
-          <div className="flex space-x-4">
-            <div className="flex-1 relative">
-              <Search className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-              <Input
-                placeholder="Search incidents by ID, title, or assignee..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="pl-10"
-              />
-            </div>
-            <Select value={statusFilter} onValueChange={setStatusFilter}>
-              <SelectTrigger className="w-40">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">All Status</SelectItem>
-                <SelectItem value="Open">Open</SelectItem>
-                <SelectItem value="In Progress">In Progress</SelectItem>
-                <SelectItem value="Resolved">Resolved</SelectItem>
-              </SelectContent>
-            </Select>
-            <Select value={priorityFilter} onValueChange={setPriorityFilter}>
-              <SelectTrigger className="w-40">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">All Priority</SelectItem>
-                <SelectItem value="Critical">Critical</SelectItem>
-                <SelectItem value="High">High</SelectItem>
-                <SelectItem value="Medium">Medium</SelectItem>
-                <SelectItem value="Low">Low</SelectItem>
-              </SelectContent>
-            </Select>
-            <Button className="gradient-primary text-primary-foreground">
-              <Plus className="h-4 w-4 mr-2" />
-              New Incident
-            </Button>
-          </div>
+        <CardContent>
+          <Table>
+            <TableHeader>
+              <TableRow className="border-border hover:bg-muted/50">
+                <TableHead className="text-muted-foreground font-medium">Ticket ID</TableHead>
+                <TableHead className="text-muted-foreground font-medium">Threat Type</TableHead>
+                <TableHead className="text-muted-foreground font-medium">Title</TableHead>
+                <TableHead className="text-muted-foreground font-medium">Severity</TableHead>
+                <TableHead className="text-muted-foreground font-medium">Status</TableHead>
+                <TableHead className="text-muted-foreground font-medium">Analyst</TableHead>
+                <TableHead className="text-muted-foreground font-medium">Created</TableHead>
+                <TableHead className="text-muted-foreground font-medium">Actions</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {incidents.map((incident) => (
+                <TableRow key={incident.id} className="border-border hover:bg-muted/20">
+                  <TableCell className="font-mono text-foreground">{incident.ticketId}</TableCell>
+                  <TableCell>{getThreatTypeBadge(incident.threatType)}</TableCell>
+                  <TableCell className="text-foreground max-w-xs truncate">{incident.title}</TableCell>
+                  <TableCell>{getSeverityBadge(incident.severity)}</TableCell>
+                  <TableCell>{getStatusBadge(incident.status)}</TableCell>
+                  <TableCell className="text-foreground">{incident.analystAssigned}</TableCell>
+                  <TableCell className="text-muted-foreground">{incident.createdAt}</TableCell>
+                  <TableCell>
+                    <Dialog>
+                      <DialogTrigger asChild>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => setSelectedIncident(incident)}
+                          className="border-border hover:bg-muted"
+                        >
+                          <FileText className="h-4 w-4 mr-1" />
+                          View Details
+                        </Button>
+                      </DialogTrigger>
+                      <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto bg-card border-border">
+                        <DialogHeader>
+                          <DialogTitle className="text-foreground font-grotesk">
+                            Incident Details - {selectedIncident?.ticketId}
+                          </DialogTitle>
+                          <DialogDescription className="text-muted-foreground">
+                            Complete incident information and response timeline
+                          </DialogDescription>
+                        </DialogHeader>
+                        {selectedIncident && (
+                          <div className="space-y-6">
+                            {/* Incident Overview */}
+                            <div className="grid grid-cols-2 gap-4">
+                              <div>
+                                <label className="text-sm font-medium text-muted-foreground">Threat Type</label>
+                                <div className="mt-1">
+                                  {getThreatTypeBadge(selectedIncident.threatType)}
+                                </div>
+                              </div>
+                              <div>
+                                <label className="text-sm font-medium text-muted-foreground">Severity</label>
+                                <div className="mt-1">
+                                  {getSeverityBadge(selectedIncident.severity)}
+                                </div>
+                              </div>
+                            </div>
 
-          <div className="rounded-lg border border-border overflow-hidden">
-            <Table>
-              <TableHeader>
-                <TableRow className="bg-muted/50">
-                  <TableHead>Incident ID</TableHead>
-                  <TableHead>Title</TableHead>
-                  <TableHead>Priority</TableHead>
-                  <TableHead>Status</TableHead>
-                  <TableHead>Assignee</TableHead>
-                  <TableHead>Created</TableHead>
+                            <div>
+                              <label className="text-sm font-medium text-muted-foreground">Title</label>
+                              <p className="text-foreground font-medium">{selectedIncident.title}</p>
+                            </div>
+
+                            <div>
+                              <label className="text-sm font-medium text-muted-foreground">Description</label>
+                              <p className="text-foreground">{selectedIncident.description}</p>
+                            </div>
+
+                            <div className="grid grid-cols-2 gap-4">
+                              <div>
+                                <label className="text-sm font-medium text-muted-foreground">Status</label>
+                                <div className="mt-1">
+                                  {getStatusBadge(selectedIncident.status)}
+                                </div>
+                              </div>
+                              <div>
+                                <label className="text-sm font-medium text-muted-foreground">Assigned Analyst</label>
+                                <p className="text-foreground">{selectedIncident.analystAssigned}</p>
+                              </div>
+                            </div>
+
+                            <div>
+                              <label className="text-sm font-medium text-muted-foreground">Affected Systems</label>
+                              <div className="mt-2 flex flex-wrap gap-2">
+                                {selectedIncident.affectedSystems.map((system, index) => (
+                                  <Badge key={index} variant="outline" className="border-border">
+                                    {system}
+                                  </Badge>
+                                ))}
+                              </div>
+                            </div>
+
+                            <div>
+                              <label className="text-sm font-medium text-muted-foreground">Estimated Impact</label>
+                              <p className="text-foreground">{selectedIncident.estimatedImpact}</p>
+                            </div>
+
+                            {/* Comments Section */}
+                            <div className="border-t border-border pt-4">
+                              <div className="flex items-center gap-2 mb-4">
+                                <MessageSquare className="h-5 w-5 text-muted-foreground" />
+                                <h4 className="font-medium text-foreground">Comments & Updates</h4>
+                              </div>
+                              
+                              <div className="space-y-3 mb-4 max-h-64 overflow-y-auto">
+                                {selectedIncident.comments.map((comment) => (
+                                  <div key={comment.id} className="p-3 bg-muted/20 rounded-lg">
+                                    <div className="flex items-center justify-between mb-2">
+                                      <span className="font-medium text-foreground">{comment.author}</span>
+                                      <span className="text-xs text-muted-foreground">{comment.timestamp}</span>
+                                    </div>
+                                    <p className="text-foreground text-sm">{comment.content}</p>
+                                  </div>
+                                ))}
+                              </div>
+
+                              <div className="flex gap-2">
+                                <Textarea
+                                  placeholder="Add a comment or update..."
+                                  value={newComment}
+                                  onChange={(e) => setNewComment(e.target.value)}
+                                  className="flex-1 bg-input border-border"
+                                />
+                                <Button 
+                                  onClick={addComment}
+                                  className="bg-gradient-cyber hover:opacity-90 text-white"
+                                >
+                                  Add Comment
+                                </Button>
+                              </div>
+                            </div>
+                          </div>
+                        )}
+                      </DialogContent>
+                    </Dialog>
+                  </TableCell>
                 </TableRow>
-              </TableHeader>
-              <TableBody>
-                {filteredIncidents.map((incident) => (
-                  <TableRow key={incident.id} className="hover:bg-muted/30 cursor-pointer">
-                    <TableCell className="font-medium">
-                      <div className="flex items-center space-x-2">
-                        {getStatusIcon(incident.status)}
-                        <span className="font-mono text-sm">{incident.id}</span>
-                      </div>
-                    </TableCell>
-                    <TableCell>
-                      <div className="space-y-1">
-                        <div className="font-medium">{incident.title}</div>
-                        <div className="text-xs text-muted-foreground">
-                          Type: {incident.type}
-                        </div>
-                      </div>
-                    </TableCell>
-                    <TableCell>
-                      {getPriorityBadge(incident.priority)}
-                    </TableCell>
-                    <TableCell>
-                      {getStatusBadge(incident.status)}
-                    </TableCell>
-                    <TableCell>
-                      <div className="flex items-center space-x-2">
-                        <User className="h-4 w-4 text-muted-foreground" />
-                        <span className="text-sm">{incident.assignee}</span>
-                      </div>
-                    </TableCell>
-                    <TableCell>
-                      <div className="flex items-center space-x-2">
-                        <Calendar className="h-4 w-4 text-muted-foreground" />
-                        <span className="text-sm">{incident.created}</span>
-                      </div>
-                    </TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          </div>
-
-          <div className="flex justify-between items-center text-sm text-muted-foreground">
-            <span>Showing {filteredIncidents.length} of {incidentData.length} incidents</span>
-            <div className="flex items-center space-x-2">
-              <span>Average Resolution Time: 2.4 hours</span>
-            </div>
-          </div>
+              ))}
+            </TableBody>
+          </Table>
         </CardContent>
       </Card>
     </div>
   );
-}
+};
+
+export default Incidents;
